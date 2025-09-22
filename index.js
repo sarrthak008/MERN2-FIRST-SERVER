@@ -13,7 +13,7 @@ app.use(express.urlencoded({ extended: true })) // converts ur url data..
 
 
 app.get("/", (req, res) => {
-    res.json({ data: null, message: "welcome in our todo api" });
+    res.status(200).json({ data: null, message: "welcome in our todo api" });
 })
 
 /// create a route to get todo...
@@ -22,11 +22,11 @@ app.get("/gettodo", (req, res) => {
 
     try {
 
-        return res.json({ data: TODOS, message: "here is your todos", success: true })
+        return res.status(200).json({ data: TODOS, message: "todos fetched successfully", success: true })
 
     } catch (error) {
 
-        return res.json({ data: null, message: error.message, success: false })
+        return res.status(500).json({ data: null, message: error.message, success: false })
 
     }
 
@@ -42,11 +42,11 @@ app.post("/addtodo", (req, res) => {
     try {
 
         if (!userId) {
-            return res.json({ data: null, message: "userId is required", success: false })
+            return res.status(401).json({ data: null, message: "userId is required", success: false })
         }
 
         if (!title) {
-            return res.json({ data: null, message: "title is required", success: false })
+            return res.status(401).json({ data: null, message: "title is required", success: false })
         }
 
         TODOS.push({
@@ -56,10 +56,10 @@ app.post("/addtodo", (req, res) => {
             "completed": false
         })
 
-        return res.json({ data: null, message: "todo added successfully", success: true })
+        return res.status(201).json({ data: null, message: "todo added successfully", success: true })
 
     } catch (error) {
-        return res.json({ data: null, message: error.message, success: false })
+        return res.status(500).json({ data: null, message: error.message, success: false })
 
     }
 })
@@ -75,14 +75,14 @@ app.get("/gettodo/:id", (req, res) => {
         let findedTodo = TODOS.find((todo) => todo.id == id)
 
         if (!findedTodo) {
-            return res.json({ data: null, message: "todo not found", success: false })
+            return res.status(404).json({ data: null, message: "todo not found", success: false })
         }
 
-        return res.json({ data: findedTodo, message: "todo found", success: true })
+        return res.status(302).json({ data: findedTodo, message: "todo found", success: true })
 
     } catch (error) {
 
-        return res.json({ data: null, message: error.message, success: false })
+        return res.status(500).json({ data: null, message: error.message, success: false })
 
     }
 })
@@ -93,39 +93,39 @@ app.delete("/deletetodo/:id", (req, res) => {
     try {
         let index = TODOS.findIndex((todo) => todo.id == id)
         if (index == -1) {
-            return res.json({ data: null, message: "todo not found", success: false })
+            return res.status(404).json({ data: null, message: "todo not found", success: false })
         }
 
         let deletedTodo = TODOS.splice(index, 1)
-        return res.json({ data: deletedTodo, message: "todo deleted successfully", success: true })
+        return res.status(200).json({ data: deletedTodo, message: "todo deleted successfully", success: true })
 
     } catch (error) {
-        return res.json({ data: null, message: error.message, success: false })
+        return res.status(500).json({ data: null, message: error.message, success: false })
     }
 })
 
 
-app.pathch("/updatestatus/:id",(req,res)=>{
-    let {id} = req.params
-     try {
-        let index = TODOS.findIndex((todo)=>todo.id == id)
-        if(index == -1){
-            return res.json({data:null,message:"todo not found",success:false})
+app.patch("/updatestatus/:id", (req, res) => {
+    let { id } = req.params
+    try {
+        let index = TODOS.findIndex((todo) => todo.id == id)
+        if (index == -1) {
+            return res.status(404).json({ data: null, message: "todo not found", success: false })
         }
 
         TODOS[index].completed = !TODOS[index].completed
-        
-        return res.json({data:TODOS[index],message:"todo updated successfully",success:true})
 
-     } catch (error) {
-         return res.json({data:null,message:error.message,success:false})
-     }
+        return res.status(200).json({ data: TODOS[index], message: "todo updated successfully", success: true })
+
+    } catch (error) {
+        return res.status(500).json({ data: null, message: error.message, success: false })
+    }
 })
 
 
 
 app.get("/health", (req, res) => {
-    return res.json({ data: null, message: "server is runnig healthy..." })
+    return res.status(200).json({ data: null, message: "server is runnig healthy..." })
 })
 
 app.listen(PORT, () => {
